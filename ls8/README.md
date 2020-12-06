@@ -308,7 +308,7 @@ If you run `python3 ls8.py examples/stack.ls8` you should see the output:
 2
 4
 1
-```
+```p
 
 ## Step 11: Implement Subroutine Calls
 
