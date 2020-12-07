@@ -66,23 +66,36 @@ class CPU:
     def prn(self, reg_num):
         print(self.reg[reg_num])
 
-    def load(self, program):
+    def load(self, filename):
         """Load a program into memory."""
 
         address = 0
 
-
         # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010,  # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111,  # PRN R0
-            0b00000000,
-            0b00000001,  # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010,  # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111,  # PRN R0
+        #     0b00000000,
+        #     0b00000001,  # HLT
+        # ]
+
+        program = []
+        with open(filename) as f:
+            for line in f:
+                split_line = line.split("#")[0]
+                stripped_split_line = split_line.strip()
+
+                if stripped_split_line != "":
+                    command = int(stripped_split_line, 2)
+                    program.append(command)
+                    print(command)
+
+        # except FileNotFoundError:
+        # print(f'Your file {sys.argv[1]} was not found by {sys.argv[0]}')
 
         for instruction in program:
             self.ram[address] = instruction
