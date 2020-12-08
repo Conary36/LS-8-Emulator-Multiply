@@ -47,11 +47,13 @@ class CPU:
         """Construct a new CPU."""
         # register 8 bits
         self.executable = {}
-        self.reg = [0] * 8
         # ram is 256 bits
         # max writable ram
         self.reg = [0] * 8
         self.ram = [0] * 256
+        self.mar = 0
+        self.mdr = 0
+        self.flag= 0
         self.pc = 0
         self.running = True
         self.ex_table()
@@ -60,8 +62,8 @@ class CPU:
         self.executable[LDI] = self.ldi
         self.executable[PRN] = self.prn
 
-    def ldi(self, reg_num, value):
-        self.reg[reg_num] = value
+    def ldi(self, reg_num, mdr):
+        self.reg[reg_num] = mdr
 
     def prn(self, reg_num):
         print(self.reg[reg_num])
@@ -101,11 +103,11 @@ class CPU:
             self.ram[address] = instruction
             address += 1
 
-    def ram_read(self, address):
-        return self.ram[address]
+    def ram_read(self, MAR):
+        return self.ram[MAR]
 
-    def ram_write(self, value, address):
-        self.ram[address] = value
+    def ram_write(self, MDR, MAR):
+        self.ram[MAR] = MDR
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -114,13 +116,13 @@ class CPU:
             self.reg[reg_a] += self.reg[reg_b]
         elif op == "SUB":
             self.reg[reg_a] -= self.reg[reg_b]
-        # elif op == "CMP":
-        #     if self.reg[reg_a] == self.reg[reg_b]:
-        #         self.flag = 0b00000001
-        #     elif self.reg[reg_a] < self.reg[reg_b]:
-        #         self.flag = 0b00000100
-        #     elif self.reg[reg_a] > self.reg[reg_b]:
-        #         self.flag = 0b00000010
+        elif op == "CMP":
+            if self.reg[reg_a] == self.reg[reg_b]:
+                self.flag = 0b00000001
+            elif self.reg[reg_a] < self.reg[reg_b]:
+                self.flag = 0b00000100
+            elif self.reg[reg_a] > self.reg[reg_b]:
+                self.flag = 0b00000010
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
 
@@ -150,27 +152,27 @@ class CPU:
     def run(self):
         """Run the CPU."""
 
-        instruction_reg = self.ram_read(self.pc)
+        active_reg = self.ram_read(self.pc)
 
-        while instruction_reg != HLT:
+        while active_reg != HLT:
 
             # Determine how many bytes in this instruction
-            num_operands = instruction_reg >> OPERANDS_OFFSET
-            print(f"instruction_reg: {bin(instruction_reg)}")
+            num_operands = active_reg >> OPERANDS_OFFSET
+            print(f"active_reg: {bin(active_reg)}")
             print(f"num_operands: {num_operands}")
 
             # Call appropriate function from dispatch table with proper number of operands
             if num_operands == 0:
-                self.executable[instruction_reg]()
+                self.executable[active_reg]()
                 self.pc += 1
             elif num_operands == 1:
-                self.executable[instruction_reg](self.ram_read(self.pc + 1))
+                self.executable[active_reg](self.ram_read(self.pc + 1))
                 self.pc += 2
             elif num_operands == 2:
-                self.executable[instruction_reg](self.ram_read(self.pc + 1), self.ram_read(self.pc + 2))
+                self.executable[active_reg](self.ram_read(self.pc + 1), self.ram_read(self.pc + 2))
                 self.pc += 3
             else:
                 print("Bad instruction")
 
             # Read next instruction
-            instruction_reg = self.ram_read(self.pc)
+            active_reg = self.ram_read(self.pc)
