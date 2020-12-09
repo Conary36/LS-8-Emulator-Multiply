@@ -50,6 +50,9 @@ class CPU:
         # ram is 256 bits
         # max writable ram
         self.reg = [0] * 8
+        # SP points at the value at the top of the stack (most recently pushed), or at address F4 if empty.
+        self.reg[7] = 0xF4  # 244 # int('F4', 16)
+        self.ir = 0
         self.ram = [0] * 256
         self.mar = 0
         self.mdr = 0
