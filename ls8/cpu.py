@@ -37,6 +37,8 @@ ST = 0b10000100
 SUB = 0b10100001
 XOR = 0b10101011
 
+
+
 OPERANDS_OFFSET = 6
 
 
@@ -56,7 +58,7 @@ class CPU:
         self.ram = [0] * 256
         self.mar = 0
         self.mdr = 0
-        self.flag= 0
+        self.fl = 0
         self.pc = 0
         self.running = True
         self.ex_table()
@@ -99,12 +101,13 @@ class CPU:
                     program.append(command)
                     print(command)
 
-        # except FileNotFoundError:
-        # print(f'Your file {sys.argv[1]} was not found by {sys.argv[0]}')
-
         for instruction in program:
             self.ram[address] = instruction
             address += 1
+
+    # @property
+    # def sp(self):
+    #     return self.reg[7]
 
     def ram_read(self, MAR):
         return self.ram[MAR]
@@ -121,11 +124,11 @@ class CPU:
             self.reg[reg_a] -= self.reg[reg_b]
         elif op == "CMP":
             if self.reg[reg_a] == self.reg[reg_b]:
-                self.flag = 0b00000001
+                self.fl = 0b00000001
             elif self.reg[reg_a] < self.reg[reg_b]:
-                self.flag = 0b00000100
+                self.fl = 0b00000100
             elif self.reg[reg_a] > self.reg[reg_b]:
-                self.flag = 0b00000010
+                self.fl = 0b00000010
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
 
@@ -174,6 +177,14 @@ class CPU:
             elif num_operands == 2:
                 self.executable[active_reg](self.ram_read(self.pc + 1), self.ram_read(self.pc + 2))
                 self.pc += 3
+
+            elif active_reg == PUSH:
+                self.reg[7] -= 1
+                self.mdr = self.reg[self.pc + 1]
+                value = self.reg[self.mdr]
+                sp = self.reg[7]
+                self.address[sp] = value
+
             else:
                 print("Bad instruction")
 
