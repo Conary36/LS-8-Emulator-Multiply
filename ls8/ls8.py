@@ -13,16 +13,9 @@ try:
         sys.exit(1)
 
     with open(sys.argv[1]) as f:
-        # for line in f:
-        # split_line = line.split("#")[0]
-        # stripped_split_line = split_line.strip()
+
         cpu.load(sys.argv[1])
         cpu.run()
-
-        # if stripped_split_line != "":
-        #    command = int(stripped_split_line, 2)
-        #
-        #     print(command)
 
 
 except FileNotFoundError:

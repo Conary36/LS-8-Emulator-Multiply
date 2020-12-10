@@ -37,8 +37,6 @@ ST = 0b10000100
 SUB = 0b10100001
 XOR = 0b10101011
 
-
-
 OPERANDS_OFFSET = 6
 
 
@@ -158,10 +156,7 @@ class CPU:
     def run(self):
         """Run the CPU."""
 
-
-
         while not HLT:
-
             # Determine how many bytes in this instruction
 
             # IR (Instruction Register) = value at memory address in PC (Program Counter)
@@ -171,25 +166,22 @@ class CPU:
             self.execute_instruction(ir, operand_a, operand_b)
 
     def execute_instruction(self, instruction, operand_a, operand_b):
-            if instruction == self.HLT:
-                self.HLT = True
-                self.pc += 1
-            elif instruction == PRN:
-                print(self.reg[operand_a])
-                self.pc += 2
-            elif instruction == LDI:
-                self.reg[operand_a] = operand_b
-                self.pc += 3
+        if instruction == self.HLT:
+            self.HLT = True
+            self.pc += 1
+        elif instruction == PRN:
+            print(self.reg[operand_a])
+            self.pc += 2
+        elif instruction == LDI:
+            self.reg[operand_a] = operand_b
+            self.pc += 3
 
-            elif instruction == PUSH:
-                self.reg[7] -= 1
-                self.mdr = self.reg[self.pc + 1]
-                value = self.reg[self.mdr]
-                sp = self.reg[7]
-                self.address[sp] = value
+        elif instruction == PUSH:
+            self.reg[7] -= 1
+            self.mdr = self.reg[self.pc + 1]
+            value = self.reg[self.mdr]
+            sp = self.reg[7]
+            self.address[sp] = value
 
-            else:
-                print("INVALID INSTRUCTION.")
-
-
-
+        else:
+            print("INVALID INSTRUCTION.")
