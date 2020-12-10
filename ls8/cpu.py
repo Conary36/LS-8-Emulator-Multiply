@@ -158,7 +158,7 @@ class CPU:
     def run(self):
         """Run the CPU."""
 
-        # active_reg = self.ram_read(self.pc)
+
 
         while not HLT:
 
@@ -192,5 +192,4 @@ class CPU:
                 print("INVALID INSTRUCTION.")
 
 
-            # # Read next instruction
-            # active_reg = self.ram_read(self.pc)
+
