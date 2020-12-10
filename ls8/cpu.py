@@ -158,27 +158,30 @@ class CPU:
     def run(self):
         """Run the CPU."""
 
-        active_reg = self.ram_read(self.pc)
+        # active_reg = self.ram_read(self.pc)
 
-        while active_reg != HLT:
+        while not HLT:
 
             # Determine how many bytes in this instruction
-            num_operands = active_reg >> OPERANDS_OFFSET
-            print(f"active_reg: {bin(active_reg)}")
-            print(f"num_operands: {num_operands}")
 
-            # Call appropriate function from dispatch table with proper number of operands
-            if num_operands == 0:
-                self.executable[active_reg]()
+            # IR (Instruction Register) = value at memory address in PC (Program Counter)
+            ir = self.ram_read(self.pc)
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
+            self.execute_instruction(ir, operand_a, operand_b)
+
+    def execute_instruction(self, instruction, operand_a, operand_b):
+            if instruction == self.HLT:
+                self.HLT = True
                 self.pc += 1
-            elif num_operands == 1:
-                self.executable[active_reg](self.ram_read(self.pc + 1))
+            elif instruction == PRN:
+                print(self.reg[operand_a])
                 self.pc += 2
-            elif num_operands == 2:
-                self.executable[active_reg](self.ram_read(self.pc + 1), self.ram_read(self.pc + 2))
+            elif instruction == LDI:
+                self.reg[operand_a] = operand_b
                 self.pc += 3
 
-            elif active_reg == PUSH:
+            elif instruction == PUSH:
                 self.reg[7] -= 1
                 self.mdr = self.reg[self.pc + 1]
                 value = self.reg[self.mdr]
@@ -186,7 +189,8 @@ class CPU:
                 self.address[sp] = value
 
             else:
-                print("Bad instruction")
+                print("INVALID INSTRUCTION.")
 
-            # Read next instruction
-            active_reg = self.ram_read(self.pc)
+
+            # # Read next instruction
+            # active_reg = self.ram_read(self.pc)
