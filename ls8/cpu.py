@@ -180,7 +180,7 @@ class CPU:
             # Decrement pointer
             self.reg[self.sp] -= 1
             self.ram[self.reg[self.sp]] = current_reg_value
-            # self.pc += 2
+            self.pc += 2
 
         elif instruction == POP:
             chosen_register = self.ram[self.pc + 1]
@@ -188,7 +188,7 @@ class CPU:
             self.reg[chosen_register] = current_mem_val
             # Increment pointer
             self.reg[self.sp] += 1
-            # self.pc += 2
+            self.pc += 2
 
         else:
             print("INVALID INSTRUCTION.")
