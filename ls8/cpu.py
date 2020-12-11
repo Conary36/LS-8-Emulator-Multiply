@@ -52,7 +52,7 @@ class CPU:
         self.reg = [0] * 8
         # SP points at the value at the top of the stack (most recently pushed), or at address F4 if empty.
         self.reg[7] = 0xF4  # 244 # int('F4', 16)
-        self.ir = 0
+        self.ir = 0  # instruction register
         self.ram = [0] * 256
         self.mar = 0
         self.mdr = 0
@@ -103,9 +103,9 @@ class CPU:
             self.ram[address] = instruction
             address += 1
 
-    # @property
-    # def sp(self):
-    #     return self.reg[7]
+    @property
+    def sp(self):
+        return self.reg[7]
 
     def ram_read(self, MAR):
         return self.ram[MAR]
@@ -120,13 +120,6 @@ class CPU:
             self.reg[reg_a] += self.reg[reg_b]
         elif op == "SUB":
             self.reg[reg_a] -= self.reg[reg_b]
-        elif op == "CMP":
-            if self.reg[reg_a] == self.reg[reg_b]:
-                self.fl = 0b00000001
-            elif self.reg[reg_a] < self.reg[reg_b]:
-                self.fl = 0b00000100
-            elif self.reg[reg_a] > self.reg[reg_b]:
-                self.fl = 0b00000010
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
 
@@ -176,12 +169,26 @@ class CPU:
             self.reg[operand_a] = operand_b
             self.pc += 3
 
+        elif instruction == MUL:
+            self.reg[operand_a] *= operand_b
+            self.pc += 3
+
+
         elif instruction == PUSH:
-            self.reg[7] -= 1
-            self.mdr = self.reg[self.pc + 1]
-            value = self.reg[self.mdr]
-            sp = self.reg[7]
-            self.address[sp] = value
+            chosen_register = self.ram[self.pc + 1]
+            current_reg_value = self.reg[chosen_register]
+            # Decrement pointer
+            self.reg[self.sp] -= 1
+            self.ram[self.reg[self.sp]] = current_reg_value
+            # self.pc += 2
+
+        elif instruction == POP:
+            chosen_register = self.ram[self.pc + 1]
+            current_mem_val = self.ram[self.reg[self.sp]]
+            self.reg[chosen_register] = current_mem_val
+            # Increment pointer
+            self.reg[self.sp] += 1
+            # self.pc += 2
 
         else:
             print("INVALID INSTRUCTION.")
