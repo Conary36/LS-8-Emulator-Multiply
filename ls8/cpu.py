@@ -107,11 +107,11 @@ class CPU:
     def sp(self):
         return self.reg[7]
 
-    def ram_read(self, MAR):
-        return self.ram[MAR]
+    def ram_read(self, mar):
+        return self.ram[mar]
 
-    def ram_write(self, MDR, MAR):
-        self.ram[MAR] = MDR
+    def ram_write(self, mdr, mar):
+        self.ram[mar] = mdr
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
