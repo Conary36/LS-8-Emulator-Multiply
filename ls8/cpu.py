@@ -190,5 +190,28 @@ class CPU:
             self.reg[self.sp] += 1
             self.pc += 2
 
+        elif instruction == CALL:
+            # PUSH the return address onto the stack
+            ## Find address/index of the command after call
+            next_command_address = self.pc + 2
+            # Push the address onto the stack
+            ## Decrement the pointer
+            self.reg[self.sp] -= 1
+            # add next command address into stack pointer memory
+            self.ram[self.reg[self.sp]] = next_command_address
+            # Jump and set the PC to address directed to by register
+            reg_number = self.ram[self.pc + 1]
+            # Get address of Subroutine out of register
+            address_to_jump_to: int = self.reg[reg_number]
+            # set the PC
+            self.pc = address_to_jump_to
+
+
+
+        elif instruction == RET:
+            self.pc = self.ram[self.reg[self.sp]]
+            # pop from stack
+            self.reg[self.sp] += 1
+
         else:
             print("INVALID INSTRUCTION.")
